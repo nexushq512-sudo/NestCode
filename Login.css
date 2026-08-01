@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: black;
+}
+
+div {
+  position: absolute;
+  top: 50%;
+
+  height: 300px;
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: cente;
+}
