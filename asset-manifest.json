@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/NestCode/static/css/main.fdb0052c.css",
+    "main.js": "/NestCode/static/js/main.2ac03885.js",
+    "static/js/550.a05ef6da.chunk.js": "/NestCode/static/js/550.a05ef6da.chunk.js",
+    "static/js/967.a201d5d0.chunk.js": "/NestCode/static/js/967.a201d5d0.chunk.js",
+    "static/js/531.268beff7.chunk.js": "/NestCode/static/js/531.268beff7.chunk.js",
+    "static/js/55.a500f936.chunk.js": "/NestCode/static/js/55.a500f936.chunk.js",
+    "index.html": "/NestCode/index.html",
+    "main.fdb0052c.css.map": "/NestCode/static/css/main.fdb0052c.css.map",
+    "main.2ac03885.js.map": "/NestCode/static/js/main.2ac03885.js.map",
+    "550.a05ef6da.chunk.js.map": "/NestCode/static/js/550.a05ef6da.chunk.js.map",
+    "967.a201d5d0.chunk.js.map": "/NestCode/static/js/967.a201d5d0.chunk.js.map",
+    "531.268beff7.chunk.js.map": "/NestCode/static/js/531.268beff7.chunk.js.map",
+    "55.a500f936.chunk.js.map": "/NestCode/static/js/55.a500f936.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fdb0052c.css",
+    "static/js/main.2ac03885.js"
+  ]
+}
