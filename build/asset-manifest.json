@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/NestCode/static/css/main.fdb0052c.css",
-    "main.js": "/NestCode/static/js/main.2246cf61.js",
+    "main.css": "/NestCode/static/css/main.e51919d8.css",
+    "main.js": "/NestCode/static/js/main.d06d35ab.js",
     "index.html": "/NestCode/index.html",
-    "main.fdb0052c.css.map": "/NestCode/static/css/main.fdb0052c.css.map",
-    "main.2246cf61.js.map": "/NestCode/static/js/main.2246cf61.js.map"
+    "main.e51919d8.css.map": "/NestCode/static/css/main.e51919d8.css.map",
+    "main.d06d35ab.js.map": "/NestCode/static/js/main.d06d35ab.js.map"
   },
   "entrypoints": [
-    "static/css/main.fdb0052c.css",
-    "static/js/main.2246cf61.js"
+    "static/css/main.e51919d8.css",
+    "static/js/main.d06d35ab.js"
   ]
 }
