@@ -391,6 +391,13 @@ body {
                                                                                                               }
 
                                         
+                                                                                                              /*git add .
+                                                                                                              git commit -m "Fix fullscreen output"
+                                                                                                              git push
+                                                                                                              npm run build
+                                                                                                              git add build
+                                                                                                              git commit -m "Update production build"
+                                                                                                              git push*/
                                       
                               
 
