@@ -1,77 +1,255 @@
-import {
-  SandpackProvider,
-  SandpackLayout,
-  SandpackPreview,
-} from "@codesandbox/sandpack-react";
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
-function Output({ files, projectType, onClose }) {
-  const sandpackFiles = {};
+function Output({ files = [], onClose }) {
+    const iframeRef = useRef(null);
 
-  files.forEach((file) => {
-    sandpackFiles[`/${file.name}`] = {
-      code: file.code || "",
-    };
-  });
+        useEffect(() => {
+                if (!iframeRef.current) return;
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* Output Header */}
-      <div
-        style={{
-          height: "50px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 15px",
-          borderBottom: "1px solid #333",
-        }}
-      >
-        <h3>Output</h3>
+                        const htmlFile = files.find(file =>
+                                    file.name.toLowerCase().endsWith(".html")
+                                            );
 
-        <button onClick={onClose}>Close</button>
-      </div>
+                                                    const cssFile = files.find(file =>
+                                                                file.name.toLowerCase().endsWith(".css")
+                                                                        );
 
-      {/* Sandpack */}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-        }}
-      >
-        <SandpackProvider
-          template={projectType || "vanilla"}
-          files={sandpackFiles}
-          options={{
-            autorun: true,
-            recompileMode: "immediate",
-            recompileDelay: 300,
-          }}
-        >
-          <SandpackLayout
-            style={{
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <SandpackPreview
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "none",
-              }}
-            />
-          </SandpackLayout>
-        </SandpackProvider>
-      </div>
-    </div>
-  );
-}
+                                                                                const jsFile = files.find(file =>
+                                                                                            file.name.toLowerCase().endsWith(".js")
+                                                                                                    );
 
-export default Output;
+                                                                                                            const html = htmlFile?.code || "";
+                                                                                                                    const css = cssFile?.code || "";
+                                                                                                                            const js = jsFile?.code || "";
+
+                                                                                                                                    let finalHTML = html;
+
+                                                                                                                                            const cssTag = css
+                                                                                                                                                        ? `<style>${css}</style>`
+                                                                                                                                                                    : "";
+
+                                                                                                                                                                            const jsTag = js
+                                                                                                                                                                                        ? `<script>${js}<\/script>`
+                                                                                                                                                                                                    : "";
+
+                                                                                                                                                                                                            if (finalHTML.includes("</head>")) {
+                                                                                                                                                                                                                        finalHTML = finalHTML.replace(
+                                                                                                                                                                                                                                        "</head>",
+                                                                                                                                                                                                                                                        `${cssTag}</head>`
+                                                                                                                                                                                                                                                                    );
+                                                                                                                                                                                                                                                                            } else {
+                                                                                                                                                                                                                                                                                        finalHTML = `${cssTag}${finalHTML}`;
+                                                                                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                                                                                        if (finalHTML.includes("</body>")) {
+                                                                                                                                                                                                                                                                                                                    finalHTML = finalHTML.replace(
+                                                                                                                                                                                                                                                                                                                                    "</body>",
+                                                                                                                                                                                                                                                                                                                                                    `${jsTag}</body>`
+                                                                                                                                                                                                                                                                                                                                                                );
+                                                                                                                                                                                                                                                                                                                                                                        } else {
+                                                                                                                                                                                                                                                                                                                                                                                    finalHTML += jsTag;
+                                                                                                                                                                                                                                                                                                                                                                                            }
+
+                                                                                                                                                                                                                                                                                                                                                                                                    iframeRef.current.srcdoc = finalHTML;
+
+                                                                                                                                                                                                                                                                                                                                                                                                        }, [files]);
+
+                                                                                                                                                                                                                                                                                                                                                                                                            return createPortal(
+                                                                                                                                                                                                                                                                                                                                                                                                                    <div className="output-fullscreen">
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                <button
+                                                                                                                                                                                                                                                                                                                                                                                                                                                className="output-close"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                onClick={onClose}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            >
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ✕
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </button>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <iframe
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ref={iframeRef}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    title="NestCode Preview"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    sandbox="allow-scripts"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                />
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                document.body
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    );
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    export default Output;
+                                                                
+                                                                                
+                                                                                
+
+                                                                                                
+                                                                                                        
+                                                                                        
+                                                                                                                                    
+                                                                                                                        
+                                                                                                                                        
+
+                                                                                                                                                
+                                                                                                                                        
+                                                                                                                                                                
+                                                                                                                                                                
+
+                                                                                                                                                                                        
+                                                                                                                                                                                                
+                                                                                                                                                                                                        
+                                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                
+                          
+                                    
+                                      
+                   
+              
+                                        
+                                           
+                        
+
+                                              
+                                                        
+                                                    
+
+                                             
+
+                                                              
+                                                      
+                                                                        
+
+                                                                                    
+                                                                                              
+                                                                                                      
+                                                                                                                
+                                                                                                                  
+                                                                                                                  
+                                                                                                                        
+
+                                                                                                        
+                                                                                                                                          
+                                                                                                                                                
+                                                                                                                                                      
+                                                                                                                                                            
+                                                                                                                                                                
+                                                                                                                                                                        
+                                                                                                                                                                                          
+                                                                                                                                                                                                
+                                                                                                                                                                                                        
+
+                                                                                                                                                                                                        
+                                                                                                                                                                                                                
+                                                                                                                                                                                                
+                                                                                                                                                                                                      
+                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                            
+
+                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                              
+
+                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                
+                                                                
+                                                                                                          
+                                                                                                                    
+                                                                                                                              
+                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                            
+                                                                                                                                                                      
+                                                                                                                                                        
+                                                                                                                                                                                    
+                                                                                                                                                                                
+
+                                                                                                                                                                                                    
+                                                                                                                                                                                        
+                                                                                                                                                                                                                      
+                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                        
+                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                          
+                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                         

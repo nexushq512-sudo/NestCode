@@ -109,7 +109,9 @@ function Files() {
 
       {/* TOP RIGHT */}
       <div className="editor-toolbar">
-        <button onClick={() => setShowOutput(true)}>▶ Run</button>
+        <button onClick={() => setShowOutput(true)}>
+            Run
+            </button>
 
         <button
           onClick={() => {
@@ -123,20 +125,51 @@ function Files() {
         </button>
       </div>
 
-      {/* CODE EDITOR */}
-      {!showOutput ? (
-        <CodeEditor
-          key={activeFile?.id}
-          activeFile={activeFile}
-          updateCode={updateCode}
-        />
-      ) : (
-        <Output
-          files={files}
-          projectType={projectType}
-          onClose={() => setShowOutput(false)}
-        />
-      )}
+    
+          <div className="editor-area">
+
+              {showOutput ? (
+                  <Output
+                        files={files}
+                              onClose={() => setShowOutput(false)}
+                                  />
+                                    ) : (
+                                        <CodeEditor
+                                              key={activeFile?.id}
+                                                    activeFile={activeFile}
+                                                          updateCode={updateCode}
+                                                              />
+                                                                )}
+
+                                                                </div>
+              
+              
+                        
+                        
+                              
+                              
+                              
+                                    
+                            
+                                                  
+                                                        
+                                                              
+                                                                
+                                                                
+              
+                    
+                        
+                            
+                              
+                                    
+                                        
+                                            
+                                                    
+                                                      
+                                                            
+                                                            
+                                            
+                                                     
     </>
   );
 }

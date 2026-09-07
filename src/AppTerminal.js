@@ -1,117 +1,98 @@
-import React, { useEffect, useRef } from "react";
-import { Terminal } from "xterm";
-import { FitAddon } from "@xterm/addon-fit";
-import { io } from "socket.io-client";
-import "xterm/css/xterm.css";
+import { useEffect, useRef, useState } from "react";
+import "./Terminal.css";
 
-function AppTerminal() {
+export default function Terminal() {
   const terminalRef = useRef(null);
+    const socketRef = useRef(null);
 
-  useEffect(() => {
-    // ========== SOCKET ==========
-    const socket = io("http://localhost:8080"); // backend URL
+      const [input, setInput] = useState("");
+        const [output, setOutput] = useState("");
 
-    // ========== TERMINAL ==========
-    const term = new Terminal({
-      cursorBlink: true,
-      theme: {
-        background: "#1e1e2e",
-        foreground: "#cdd6f4",
-        cursor: "#89b4fa",
-      },
-      fontSize: 15,
-      fontFamily: "monospace",
-      disableStdin: false, // IMPORTANT
-      convertEol: true,
-    });
+          useEffect(() => {
+              terminalRef.current?.focus();
 
-    const fitAddon = new FitAddon();
-    term.loadAddon(fitAddon);
+                  // Backend PTY server
+                      const socket = new WebSocket("ws://localhost:3000/terminal");
 
-    // ========== OPEN ==========
-    term.open(terminalRef.current);
-    fitAddon.fit();
+                          socketRef.current = socket;
 
-    // ========== FORCE FOCUS (Main Fix) ==========
-    setTimeout(() => {
-      term.focus();
-      const textarea = terminalRef.current?.querySelector("textarea");
-      if (textarea) {
-        textarea.focus();
-        // Yeh line mobile/keyboard ke liye important hai
-        textarea.setAttribute("autofocus", "true");
-      }
-    }, 200);
+                              socket.onmessage = (event) => {
+                                    setOutput((prev) => prev + event.data);
+                                        };
 
-    // ========== WELCOME ==========
-    term.writeln("\x1b[1;32m✅ NestCode Terminal Ready\x1b[0m");
-    term.writeln("\x1b[1;34mType anything below...\x1b[0m");
-    term.write("\r\n$ ");
+                                            socket.onerror = () => {
+                                                  setOutput((prev) => prev + "\r\n[Connection error]\r\n");
+                                                      };
 
-    // ========== INPUT HANDLER (Typing) ==========
-    term.onData((data) => {
-      console.log("Typed:", data); // Debug
-      socket.emit("terminal-input", data);
-    });
+                                                          return () => {
+                                                                socket.close();
+                                                                    };
+                                                                      }, []);
 
-    // ========== OUTPUT HANDLER ==========
-    socket.on("terminal-output", (data) => {
-      term.write(data);
-    });
+                                                                        function handleKeyDown(e) {
+                                                                            e.preventDefault();
 
-    // ========== RESIZE ==========
-    const handleResize = () => {
-      fitAddon.fit();
-      socket.emit("terminal-resize", {
-        cols: term.cols,
-        rows: term.rows,
-      });
-    };
-    window.addEventListener("resize", handleResize);
+                                                                                if (e.key === "Enter") {
+                                                                                      socketRef.current?.send("\r");
 
-    // ========== CLICK FIX (Jab user click kare) ==========
-    const handleContainerClick = () => {
-      term.focus();
-      const textarea = terminalRef.current?.querySelector("textarea");
-      if (textarea) textarea.focus();
-    };
+                                                                                            setInput("");
+                                                                                                  return;
+                                                                                                      }
 
-    const container = terminalRef.current;
-    container?.addEventListener("click", handleContainerClick);
+                                                                                                          if (e.key === "Backspace") {
+                                                                                                                socketRef.current?.send("\x7f");
 
-    // ========== TOUCH FIX (Mobile) ==========
-    const handleTouchStart = () => {
-      term.focus();
-      const textarea = terminalRef.current?.querySelector("textarea");
-      if (textarea) textarea.focus();
-    };
-    container?.addEventListener("touchstart", handleTouchStart);
+                                                                                                                      setInput((prev) => prev.slice(0, -1));
+                                                                                                                            return;
+                                                                                                                                }
 
-    // ========== CLEANUP ==========
-    return () => {
-      socket.disconnect();
-      term.dispose();
-      window.removeEventListener("resize", handleResize);
-      container?.removeEventListener("click", handleContainerClick);
-      container?.removeEventListener("touchstart", handleTouchStart);
-    };
-  }, []);
+                                                                                                                                    if (e.key === "ArrowUp") {
+                                                                                                                                          socketRef.current?.send("\x1b[A");
+                                                                                                                                                return;
+                                                                                                                                                    }
 
-  return (
-    <div
-      ref={terminalRef}
-      style={{
-        width: "100%",
-        height: "400px",
-        background: "#1e1e2e",
-        borderRadius: "12px",
-        padding: "6px",
-        touchAction: "none",
-        cursor: "text",
-        overflow: "hidden",
-      }}
-    />
-  );
-}
+                                                                                                                                                        if (e.key === "ArrowDown") {
+                                                                                                                                                              socketRef.current?.send("\x1b[B");
+                                                                                                                                                                    return;
+                                                                                                                                                                        }
 
-export default AppTerminal;
+                                                                                                                                                                            if (e.key === "ArrowLeft") {
+                                                                                                                                                                                  socketRef.current?.send("\x1b[D");
+                                                                                                                                                                                        return;
+                                                                                                                                                                                            }
+
+                                                                                                                                                                                                if (e.key === "ArrowRight") {
+                                                                                                                                                                                                      socketRef.current?.send("\x1b[C");
+                                                                                                                                                                                                            return;
+                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                    if (
+                                                                                                                                                                                                                          e.key.length === 1 &&
+                                                                                                                                                                                                                                !e.ctrlKey &&
+                                                                                                                                                                                                                                      !e.altKey &&
+                                                                                                                                                                                                                                            !e.metaKey
+                                                                                                                                                                                                                                                ) {
+                                                                                                                                                                                                                                                      socketRef.current?.send(e.key);
+
+                                                                                                                                                                                                                                                            setInput((prev) => prev + e.key);
+                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                  }
+
+                                                                                                                                                                                                                                                                    return (
+                                                                                                                                                                                                                                                                        <div
+                                                                                                                                                                                                                                                                              ref={terminalRef}
+                                                                                                                                                                                                                                                                                    className="terminal"
+                                                                                                                                                                                                                                                                                          tabIndex={0}
+                                                                                                                                                                                                                                                                                                onKeyDown={handleKeyDown}
+                                                                                                                                                                                                                                                                                                    >
+                                                                                                                                                                                                                                                                                                          <pre className="terminal-output">
+                                                                                                                                                                                                                                                                                                                  {output}
+                                                                                                                                                                                                                                                                                                                        </pre>
+
+                                                                                                                                                                                                                                                                                                                              <div className="terminal-line">
+                                                                                                                                                                                                                                                                                                                                      {input}
+                                                                                                                                                                                                                                                                                                                                              <span className="cursor" />
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                          );
+                                                                                                                                                                                                                                                                                                                                                          }
