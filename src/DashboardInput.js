@@ -1,49 +1,33 @@
 import { useState } from "react";
-import DashboardInput from "./DashboardInput";
-import CodeEditor from "./CodeEditor";
 
-function Dashboard() {
-  const [projects, setProjects] = useState([]);
+function DashboardInput({ onCreate }) {
 
-    function createProject(projectName) {
-        if (!projectName.trim()) return;
+    const [projectName, setProjectName] = useState("");
 
-            setProjects(prev => [
-                  ...prev,
-                        {
-             id: crypto.randomUUID(),
-                     name: projectName
-                    }
-                 ]);
-                             }
+        const handleCreate = () => {
+                if (!projectName.trim()) return;
 
-           return (
-                     <div>
-            <button className="Create">
-           Create
-                </button>
+                        onCreate(projectName);
 
-   <DashboardInput onCreate={createProject} />
+                                setProjectName("");
+                                    };
 
-                   <div className="ProjectContainer">
-          {projects.map(project => (
-        <div className="ProjectBox" key={project.id}>
-                                                                                                                    
-      <h2 className="ProjectName">
-    {project.name}
-           </h2>
+                                        return (
+                                                <div>
 
-          <button className="ProjectOpenBtn">
-             Open
-              </button>
+                                                            <input
+                                                                            type="text"
+                                                                                            placeholder="Enter your project name"
+                                                                                                            value={projectName}
+                                                                                                                            onChange={(e) => setProjectName(e.target.value)}
+                                                                                                                                        />
 
-               <CodeEditor projectId={project.id} />
-                                                                                                                                                                                                                            
-                      </div>
-          ))}
-              </div>
-                     </div>
-                 );
-              }
+                                                                                                                                                    <button onClick={handleCreate}>
+                                                                                                                                                                    Create
+                                                                                                                                                                                </button>
 
-                 export default Dashboard;
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                            );
+                                                                                                                                                                                            }
+
+                                                                                                                                                                                            export default DashboardInput;

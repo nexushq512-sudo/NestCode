@@ -1,33 +1,60 @@
 import { useState } from "react";
+import DashboardInput from "./DashboardInput";
 
-function DashboardInput({ onCreate }) {
-  const [projectName, setProjectName] = useState("");
+function Dashboard() {
 
-    function projectCreateBtn() {
-        if (!projectName.trim()) return;
+    const [projects, setProjects] = useState(() => {
+            const savedProjects = localStorage.getItem("nestcode_projects");
 
-            onCreate(projectName);
+                    return savedProjects
+                                ? JSON.parse(savedProjects)
+                                            : [];
+                                                });
 
-                setProjectName("");
-                  }
+                                                    const createProject = (projectName) => {
 
-                    return (
-                        <div>
-                              <input
-                                      className="ProjectName"
-                       placeholder="Enter your project name"
-               onChange={(e) => setProjectName(e.target.value)}
-                           value={projectName}
-                                  />
+                                                            const newProject = {
+                                                                        id: Date.now(),
+                                                                                    name: projectName
+                                                                                            };
 
-                           <button
-                                className="ProjectCreateBtn"
-                             onClick={projectCreateBtn}
-                                 >
-                              Create Project
-                         </button>
-                               </div>
-                                 );
-                       }
+                                                                                                    const updatedProjects = [...projects, newProject];
 
-                        export default DashboardInput;
+                                                                                                            setProjects(updatedProjects);
+
+                                                                                                                    localStorage.setItem(
+                                                                                                                                "nestcode_projects",
+                                                                                                                                            JSON.stringify(updatedProjects)
+                                                                                                                                                    );
+                                                                                                                                                        };
+
+                                                                                                                                                            return (
+                                                                                                                                                                    <div className="projectContainer">
+
+                                                                                                                                                                                <h2>My Projects</h2>
+
+                                                                                                                                                                                            <DashboardInput onCreate={createProject} />
+
+                                                                                                                                                                                                        {projects.map((project) => (
+                                                                                                                                                                                                                        <div key={project.id}>
+                                                                                                                                                                                                                                            {project.name}
+                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                        ))}
+
+                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                    );
+                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                    export default Dashboard;
+                                                          
+                                                              
+                                                                                        
+                                                                                                      
+                                                                                                                        
+                                                                                                                                    
+
+                                                                                                                                                
+                                                                                                                                                                
+                                                                                                                                                                
+
+                                                                                                                                                                                                                
